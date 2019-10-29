@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'enum_kit'
+require 'irb'
+
+IRB.start
