@@ -22,8 +22,10 @@ Gem::Specification.new do |spec|
   spec.metadata['yard.run'] = 'yri'
 
   spec.add_development_dependency 'bundler',     '~> 2.0'
+  spec.add_development_dependency 'combustion',  '~> 1.1'
   spec.add_development_dependency 'guard-rspec', '~> 4.7'
   spec.add_development_dependency 'rake',        '~> 13.0'
   spec.add_development_dependency 'rspec',       '~> 3.8'
+  spec.add_development_dependency 'rspec-rails', '~> 3.8'
   spec.add_development_dependency 'yard',        '~> 0.9.20'
 end

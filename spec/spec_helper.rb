@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# NOTE: Do we need this?
-# $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-
 # Conventionally, all specs live under a `spec` directory, which RSpec adds to the `$LOAD_PATH`.
 # The `.rspec` file contains `--require spec_helper` which will cause this file to always be loaded,
 # without a need to explicitly require it in any files.
@@ -15,6 +12,20 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+# Bundler
+require 'bundler'
+
+Bundler.require :default, :test
+
+# Combustion
+require 'combustion'
+
+Combustion.initialize! :active_record
+
+# Rails
+require 'rspec/rails'
+
+# RSpec
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate assertion/expectation library such as wrong or the
   # stdlib/minitest assertions if you prefer.
@@ -67,8 +78,8 @@ RSpec.configure do |config|
     config.default_formatter = 'doc'
   end
 
-  # Print the 10 slowest examples and example groups at the end of the spec run, to help surface which specs are running
-  # particularly slow.
+  # Print the 10 slowest examples and example groups at the end of the spec run, to help surface which specs are
+  # running particularly slow.
   # config.profile_examples = 10
 
   # Run specs in random order to surface order dependencies. If you find an order dependency and want to debug it, you

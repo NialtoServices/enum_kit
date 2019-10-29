@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'enum_kit/constants'
-
 RSpec.describe EnumKit do
   describe '::VERSION' do
     subject { described_class::VERSION }
