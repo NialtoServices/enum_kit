@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'enum_kit/active_record_extensions/connection_adapters/postgresql/schema_dumper'
+
 # :nodoc:
 #
 module EnumKit
@@ -17,11 +19,7 @@ module EnumKit
         module ColumnDumper
           # :nodoc:
           #
-          def prepare_column_options(column)
-            spec = super
-            spec[:name] = column.sql_type.inspect if column.type == :enum
-            spec
-          end
+          prepend EnumKit::ActiveRecordExtensions::ConnectionAdapters::PostgreSQL::SchemaDumper
         end
       end
     end

@@ -39,7 +39,6 @@ module EnumKit
       ConnectionAdapters::PostgreSQL::SchemaDumper
       ConnectionAdapters::PostgreSQLAdapter
       Migration::CommandRecorder
-      SchemaDumper
     ].each do |extension|
       next unless Object.const_defined?("ActiveRecord::#{extension}")
 
