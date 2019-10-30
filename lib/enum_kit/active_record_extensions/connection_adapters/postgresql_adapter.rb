@@ -99,6 +99,8 @@ module EnumKit
         # @param new_value     [String|Symbol] The enum value's new name.
         #
         def rename_enum_value(name, current_name, new_name)
+          ensure_renaming_enum_values_is_supported!
+
           name         = EnumKit.sanitize_name!(name)
           current_name = EnumKit.sanitize_value!(current_name)
           new_name     = EnumKit.sanitize_value!(new_name)
@@ -118,6 +120,14 @@ module EnumKit
           spec = super
           spec[:enum_type] = column.sql_type.inspect if column.type == :enum
           spec
+        end
+
+        # Raise an exception if the active PostgreSQL version doesn't support renaming enum values.
+        #
+        def ensure_renaming_enum_values_is_supported!
+          return if ActiveRecord::Base.connection.send(:postgresql_version) >= 100_000
+
+          raise NotImplementedError, 'PostgreSQL 10.0+ is required to enable renaming of enum values.'
         end
       end
     end
