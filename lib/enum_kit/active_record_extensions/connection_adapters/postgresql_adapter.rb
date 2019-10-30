@@ -55,6 +55,15 @@ module EnumKit
           execute "DROP TYPE #{name}"
         end
 
+        # Rename an existing enum type.
+        #
+        # @param current_name [String] The current enum name.
+        # @param new_name     [String] The new enum name.
+        #
+        def rename_enum(current_name, new_name)
+          execute "ALTER TYPE #{current_name} RENAME TO #{new_name}"
+        end
+
         # :nodoc:
         #
         def migration_keys

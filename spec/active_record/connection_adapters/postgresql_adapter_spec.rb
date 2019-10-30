@@ -56,4 +56,31 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
       end
     end
   end
+
+  describe '#rename_enum' do
+    before do
+      connection.execute "CREATE TYPE an_enum AS ENUM ('first', 'second')"
+    end
+
+    after do
+      connection.execute 'DROP TYPE IF EXISTS an_enum'
+      connection.execute 'DROP TYPE IF EXISTS another_enum'
+    end
+
+    context 'when called with an existing enum' do
+      subject { connection.rename_enum(:an_enum, :another_enum) }
+
+      it 'renames the enum' do
+        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
+      end
+    end
+
+    context 'when called with a non-existent enum' do
+      subject { connection.rename_enum(:non_existent_enum, :another_enum) }
+
+      it 'raises ActiveRecord::StatementInvalid' do
+        expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
+      end
+    end
+  end
 end

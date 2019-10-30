@@ -26,6 +26,12 @@ module EnumKit
 
         # :nodoc:
         #
+        def rename_enum(*args)
+          record(:rename_enum, args)
+        end
+
+        # :nodoc:
+        #
         def invert_create_enum(args)
           record(:drop_enum, args.first)
         end
@@ -38,6 +44,12 @@ module EnumKit
           end
 
           record(:create_enum, args)
+        end
+
+        # :nodoc:
+        #
+        def invert_rename_enum(args)
+          record(:rename_enum, args.reverse)
         end
       end
     end
