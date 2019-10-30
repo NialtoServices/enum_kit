@@ -55,6 +55,14 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
       end
     end
+
+    context 'when called with a malformed name' do
+      subject { connection.drop_enum('an enum') }
+
+      it 'raises an ArgumentError' do
+        expect { subject }.to raise_exception(ArgumentError)
+      end
+    end
   end
 
   describe '#rename_enum' do
@@ -80,6 +88,22 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
+      end
+    end
+
+    context 'when called with a malformed current name' do
+      subject { connection.rename_enum('an enum', :another_enum) }
+
+      it 'raises an ArgumentError' do
+        expect { subject }.to raise_exception(ArgumentError)
+      end
+    end
+
+    context 'when called with a malformed new name' do
+      subject { connection.rename_enum(:an_enum, 'another enum') }
+
+      it 'raises an ArgumentError' do
+        expect { subject }.to raise_exception(ArgumentError)
       end
     end
   end

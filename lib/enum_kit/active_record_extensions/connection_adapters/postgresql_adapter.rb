@@ -47,21 +47,26 @@ module EnumKit
           execute "CREATE TYPE #{name} AS ENUM #{EnumKit.sqlize(values)}"
         end
 
+        # Rename an existing enum type.
+        #
+        # @param current_name [Symbol] The current enum name.
+        # @param new_name     [Symbol] The new enum name.
+        #
+        def rename_enum(current_name, new_name)
+          current_name = EnumKit.sanitize_name!(current_name)
+          new_name     = EnumKit.sanitize_name!(new_name)
+
+          execute "ALTER TYPE #{current_name} RENAME TO #{new_name}"
+        end
+
         # Drop an existing enum type from the database.
         #
         # @param name [Symbol] The name of the existing enum type.
         #
         def drop_enum(name)
-          execute "DROP TYPE #{name}"
-        end
+          name = EnumKit.sanitize_name!(name)
 
-        # Rename an existing enum type.
-        #
-        # @param current_name [String] The current enum name.
-        # @param new_name     [String] The new enum name.
-        #
-        def rename_enum(current_name, new_name)
-          execute "ALTER TYPE #{current_name} RENAME TO #{new_name}"
+          execute "DROP TYPE #{name}"
         end
 
         # :nodoc:
