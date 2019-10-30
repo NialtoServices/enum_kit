@@ -17,7 +17,7 @@ module ActiveRecord
       type = type.instance_eval { subtype } if type.is_a?(ActiveRecord::Enum::EnumType)
 
       # Query the PostgreSQL database for the enum's acceptable values.
-      connection.enums[type.name]
+      connection.enums[type.enum_type]
     end
 
     # Define a PostgreSQL enum type.
