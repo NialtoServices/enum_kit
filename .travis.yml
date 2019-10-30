@@ -19,3 +19,4 @@ before_script:
 env:
   global:
     - DATABASE_URL="postgresql://127.0.0.1:5432/enum_kit_test"
+    - RSPEC_DEFAULT_FORMATTER=doc
