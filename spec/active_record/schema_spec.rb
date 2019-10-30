@@ -14,7 +14,7 @@ RSpec.describe 'ActiveRecord Schema', :integration do
     expect(subject).to include('create_enum :shirt_size, ["small", "medium", "large"]')
   end
 
-  it 'includes :enum column statements' do
+  it 'includes `t.enum` statements' do
     expect(subject).to include('t.enum "size", enum_type: "shirt_size"')
   end
 end
