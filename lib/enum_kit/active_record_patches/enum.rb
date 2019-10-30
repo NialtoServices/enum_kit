@@ -12,12 +12,11 @@ module ActiveRecord
     # @return [Array]          The acceptable values for the enum type associated with the column.
     #
     def pg_enum_values(name)
-      # Determine the PostgreSQL type name for the enum.
-      type = type_for_attribute(name)
-      type = type.instance_eval { subtype } if type.is_a?(ActiveRecord::Enum::EnumType)
+      # Determine the PostgreSQL type for the enum.
+      type = columns_hash[name.to_s].sql_type
 
       # Query the PostgreSQL database for the enum's acceptable values.
-      connection.enums[type.enum_type]
+      connection.enums[type.to_sym]
     end
 
     # Define a PostgreSQL enum type.
