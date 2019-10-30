@@ -30,6 +30,9 @@ module ActiveRecord
       enum(name => Hash[values])
 
       enum = type_for_attribute(name)
+
+      raise 'Expected an ActiveRecord::Enum::EnumType' unless enum.is_a?(ActiveRecord::Enum::EnumType)
+
       enum.disable_exceptions = options.key?(:exceptions) && !options[:exceptions]
 
       nil
