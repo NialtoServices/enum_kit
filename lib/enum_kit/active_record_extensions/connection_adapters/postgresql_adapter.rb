@@ -69,6 +69,43 @@ module EnumKit
           execute "DROP TYPE #{name}"
         end
 
+        # Add a new value to an enum type in the database.
+        #
+        # Note that you can't specify both :before and :after.
+        #
+        # @param name   [Symbol]        The enum's name.
+        # @param value  [String|Symbol] The value to add.
+        # @param after  [String|Symbol] An existing value after which the new value should be inserted.
+        # @param before [String|Symbol] An existing value before which the new value should be inserted.
+        #
+        def add_enum_value(name, value, after: nil, before: nil)
+          name  = EnumKit.sanitize_name!(name)
+          value = EnumKit.sanitize_value!(value)
+
+          statement = "ALTER TYPE #{name} ADD VALUE #{EnumKit.sqlize(value)}"
+
+          raise ArgumentError, "You can't specify both :before and :after" if before && after
+
+          statement += " AFTER #{EnumKit.sqlize(EnumKit.sanitize_value!(after))}"   if after
+          statement += " BEFORE #{EnumKit.sqlize(EnumKit.sanitize_value!(before))}" if before
+
+          execute(statement)
+        end
+
+        # Rename a value within an enum type in the database.
+        #
+        # @param name          [Symbol]        The enum's name.
+        # @param current_value [String|Symbol] The enum value's current name.
+        # @param new_value     [String|Symbol] The enum value's new name.
+        #
+        def rename_enum_value(name, current_name, new_name)
+          name         = EnumKit.sanitize_name!(name)
+          current_name = EnumKit.sanitize_value!(current_name)
+          new_name     = EnumKit.sanitize_value!(new_name)
+
+          execute "ALTER TYPE #{name} RENAME VALUE #{EnumKit.sqlize(current_name)} TO #{EnumKit.sqlize(new_name)}"
+        end
+
         # :nodoc:
         #
         def migration_keys
