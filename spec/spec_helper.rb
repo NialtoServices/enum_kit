@@ -70,11 +70,14 @@ RSpec.configure do |config|
   #   - http://rspec.info/blog/2014/05/notable-changes-in-rspec-3/#zero-monkey-patching-mode
   config.disable_monkey_patching!
 
-  # Many RSpec users commonly either run the entire suite or an individual file, and it's useful to allow more verbose
-  # output when running an individual spec file.
-  if config.files_to_run.one?
-    # Use the documentation formatter for detailed output, unless a formatter has already been configured (e.g. via a
-    # command-line flag).
+  # Retrieve the default formatter from the current environment.
+  default_formatter = ENV['RSPEC_DEFAULT_FORMATTER']
+
+  if default_formatter.is_a?(String) && !default_formatter.empty?
+    config.default_formatter = default_formatter
+  elsif config.files_to_run.one?
+    # Use the documentation formatter for detailed output when running an individual spec file, unless a formatter has
+    # already been configured (e.g. via a command-line flag or using the RSPEC_DEFAULT_FORMAT environment variable).
     config.default_formatter = 'doc'
   end
 
