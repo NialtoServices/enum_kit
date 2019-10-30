@@ -7,7 +7,7 @@ RSpec.describe 'ActiveRecord Schema', :integration do
   subject do
     ActiveRecord::SchemaDumper.dump(connection, stream)
     stream.rewind
-    stream.read
+    stream.read.split("\n").map { |line| line.gsub(/\s+/, ' ').strip }
   end
 
   it 'includes `create_enum` statements' do
