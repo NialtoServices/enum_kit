@@ -2,9 +2,6 @@ language: ruby
 rvm:
   - 2.6.5
 gemfile:
-  - travis/gemfiles/4.0.gemfile
-  - travis/gemfiles/4.1.gemfile
-  - travis/gemfiles/4.2.gemfile
   - travis/gemfiles/5.0.gemfile
   - travis/gemfiles/5.1.gemfile
   - travis/gemfiles/5.2.gemfile
