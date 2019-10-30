@@ -1,5 +1,7 @@
 # EnumKit
 
+[![Build Status](https://travis-ci.org/NialtoServices/enum_kit.svg?branch=master)](https://travis-ci.org/NialtoServices/enum_kit)
+
 EnumKit provides native support for PostgreSQL enums in Ruby on Rails projects.
 
 ## Installation
