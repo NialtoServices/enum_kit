@@ -3,6 +3,11 @@
 RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   subject(:connection) { ActiveRecord::Base.connection }
 
+  before do
+    # Sanity check to ensure ActiveRecord is configured to use a PostgreSQL database.
+    expect(connection).to be_a(described_class)
+  end
+
   describe '#create_enum' do
     after { connection.execute 'DROP TYPE IF EXISTS an_enum' }
 
