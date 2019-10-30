@@ -3,5 +3,5 @@
 module EnumKit
   # @return [String] The gem's semantic version number.
   #
-  VERSION = '0.2.0.alpha1'
+  VERSION = '0.2.0'
 end
