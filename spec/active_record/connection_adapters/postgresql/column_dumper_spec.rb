@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-# The `SchemaDumper` class is used by ActiveRecord '>= 5.2.0'.
-# For older versions, see the `ColumnDumper` class instead.
-return unless defined?(ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper)
+# The `ColumnDumper` class is used by ActiveRecord '< 5.2.0'.
+# For newer versions, see the `SchemaDumper` class instead.
+return unless defined?(ActiveRecord::ConnectionAdapters::PostgreSQL::ColumnDumper)
 
-RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper do
+RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQL::ColumnDumper do
   let(:connection) { ActiveRecord::Base.connection }
   let(:stream)     { StringIO.new }
 
