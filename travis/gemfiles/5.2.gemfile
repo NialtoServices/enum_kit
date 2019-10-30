@@ -2,16 +2,7 @@
 
 source 'https://rubygems.org'
 
+gemspec path: '../../'
+
 gem 'activerecord',  '~> 5.2'
 gem 'activesupport', '~> 5.2'
-gem 'pg'
-
-group :development, :test do
-  gem 'bundler',     '~> 2.0'
-  gem 'combustion',  '~> 1.1'
-  gem 'guard-rspec', '~> 4.7'
-  gem 'rake',        '~> 13.0'
-  gem 'rspec',       '~> 3.8'
-  gem 'rspec-rails', '~> 3.8'
-  gem 'yard',        '~> 0.9.20'
-end
