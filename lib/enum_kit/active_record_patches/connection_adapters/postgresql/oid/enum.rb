@@ -15,14 +15,14 @@ module ActiveRecord
         # :nodoc:
         #
         class Enum < Type::Value
-          # @return [String] The PostgreSQL type for the enum.
+          # @return [String] The name of the PostgreSQL type representing the enum.
           #
-          attr_reader :name
+          attr_reader :enum_type
 
           # :nodoc:
           #
           def initialize(options = {})
-            @name = options.delete(:name).to_sym
+            @enum_type = options.delete(:enum_type).to_sym
             super
           end
         end

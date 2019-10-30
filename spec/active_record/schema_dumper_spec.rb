@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-# The `SchemaDumper` class is used by ActiveRecord '>= 5.2.0'.
-# For older versions, see the `ColumnDumper` class instead.
-return unless defined?(ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper)
-
-RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper do
+RSpec.describe ActiveRecord::SchemaDumper do
   let(:connection) { ActiveRecord::Base.connection }
   let(:stream)     { StringIO.new }
 
@@ -46,10 +42,10 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper do
     end
   end
 
-  describe '#extensions' do
+  describe '#tables' do
     it 'invokes #enums' do
       expect(subject).to receive(:enums).with(stream).once
-      subject.extensions(stream)
+      subject.tables(stream)
     end
   end
 end

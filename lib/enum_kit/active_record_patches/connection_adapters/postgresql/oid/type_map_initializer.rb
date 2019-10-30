@@ -18,7 +18,7 @@ module ActiveRecord
           # :nodoc:
           #
           def register_enum_type(row)
-            register row['oid'], ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Enum.new(name: row['typname'])
+            register row['oid'], ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Enum.new(enum_type: row['typname'])
           end
         end
       end

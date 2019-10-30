@@ -58,14 +58,14 @@ module EnumKit
         # :nodoc:
         #
         def migration_keys
-          super + [:name]
+          super + [:enum_type]
         end
 
         # :nodoc:
         #
-        def prepare_column_options(column, types)
-          spec = super(column, types)
-          spec[:name] = column.cast_type.type.inspect if column.type == :enum
+        def prepare_column_options(column)
+          spec = super
+          spec[:enum_type] = column.sql_type.inspect if column.type == :enum
           spec
         end
       end
