@@ -37,7 +37,7 @@ module EnumKit
 
         # Create a new enum type in the database.
         #
-        # @param name   [Symbol] The name of the new enum type.
+        # @param name   [Symbol] The enum's name.
         # @param values [Array]  The enum's acceptable values.
         #
         def create_enum(name, values)
@@ -49,8 +49,8 @@ module EnumKit
 
         # Rename an existing enum type.
         #
-        # @param current_name [Symbol] The current enum name.
-        # @param new_name     [Symbol] The new enum name.
+        # @param current_name [Symbol] The enum's current name.
+        # @param new_name     [Symbol] The enum's new name.
         #
         def rename_enum(current_name, new_name)
           current_name = EnumKit.sanitize_name!(current_name)
@@ -61,7 +61,7 @@ module EnumKit
 
         # Drop an existing enum type from the database.
         #
-        # @param name [Symbol] The name of the existing enum type.
+        # @param name [Symbol] The enum's name.
         #
         def drop_enum(name)
           name = EnumKit.sanitize_name!(name)

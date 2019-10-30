@@ -12,13 +12,13 @@ module EnumKit
       # :nodoc:
       #
       module CommandRecorder
-        # :nodoc:
+        # Record the creation of an enum type.
         #
         def create_enum(*args)
           record(:create_enum, args)
         end
 
-        # :nodoc:
+        # Record the deletion of an enum type.
         #
         def drop_enum(*args)
           record(:drop_enum, args)

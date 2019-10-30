@@ -40,7 +40,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     before { connection.execute "CREATE TYPE an_enum AS ENUM ('first', 'second')" }
     after  { connection.execute 'DROP TYPE IF EXISTS an_enum' }
 
-    context 'when called with an existing enum' do
+    context 'when called with valid arguments' do
       subject { connection.drop_enum(:an_enum) }
 
       it 'drops the enum' do
@@ -48,7 +48,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
       end
     end
 
-    context 'when called with a non-existent enum' do
+    context 'when called with a non-existent enum name' do
       subject { connection.drop_enum(:non_existent_enum) }
 
       it 'raises ActiveRecord::StatementInvalid' do
