@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper do
+klass = if defined?(ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper)
+          ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper
+        else
+          ActiveRecord::ConnectionAdapters::PostgreSQL::ColumnDumper
+        end
+
+RSpec.describe klass do
   let(:connection) { ActiveRecord::Base.connection }
   let(:stream)     { StringIO.new }
 
