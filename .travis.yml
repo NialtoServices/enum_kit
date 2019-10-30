@@ -11,6 +11,12 @@ before_install:
   - gem install bundler
 before_script:
   - psql -c 'CREATE DATABASE enum_kit_test;' -U postgres
+addons:
+  postgresql: 10
+  apt:
+    packages:
+      - postgresql-10
+      - postgresql-client-10
 env:
   global:
     - DATABASE_URL="postgresql://127.0.0.1:5432/enum_kit_test"
