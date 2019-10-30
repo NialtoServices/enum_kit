@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe ActiveRecord::Base do
+RSpec.describe ActiveRecord::Base, :unit do
   describe '.pg_enum' do
     it 'is defined' do
       expect(described_class).to respond_to(:pg_enum)

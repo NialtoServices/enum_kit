@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe ActiveRecord::Validations::PgEnumValidator do
+RSpec.describe ActiveRecord::Validations::PgEnumValidator, :unit do
   subject { Shirt.create(name: 'Plain Shirt', size: :small) }
 
   it 'permits known values' do

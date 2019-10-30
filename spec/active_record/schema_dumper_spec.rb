@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe ActiveRecord::SchemaDumper do
+RSpec.describe ActiveRecord::SchemaDumper, :unit do
   let(:connection) { ActiveRecord::Base.connection }
   let(:stream)     { StringIO.new }
 

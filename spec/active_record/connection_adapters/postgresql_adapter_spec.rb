@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter do
+RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   subject(:connection) { ActiveRecord::Base.connection }
 
   describe '#create_enum' do
