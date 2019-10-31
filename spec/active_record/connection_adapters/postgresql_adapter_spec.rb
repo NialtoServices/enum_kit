@@ -30,6 +30,16 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
   end
 
+  describe '#enums' do
+    before { connection.execute "CREATE TYPE sizes AS ENUM ('small', 'medium', 'large', 'extra large')" }
+    after  { connection.execute 'DROP TYPE IF EXISTS sizes' }
+
+    subject { connection.enums }
+
+    it 'retrieves the enums' do
+      expect(subject).to include(sizes: ['small', 'medium', 'large', 'extra large'])
+    end
+  end
 
   describe '#enum_execute' do
     subject { connection.enum_execute('SELECT 1=1') }
