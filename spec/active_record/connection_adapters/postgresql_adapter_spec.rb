@@ -8,19 +8,26 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     expect(connection).to be_a(described_class)
   end
 
+  %i[create_enum rename_enum drop_enum add_enum_value rename_enum_value].each do |method|
+    define_method(method) do |*args, &block|
+      connection.send(method, *args, &block).result_status
+    end
+  end
+
   describe '#create_enum' do
-    after { connection.execute 'DROP TYPE IF EXISTS an_enum' }
+    after { connection.execute 'DROP TYPE IF EXISTS sizes' }
 
     context 'when called with valid arguments' do
-      subject { connection.create_enum(:an_enum, [:first_value, 'second value']) }
+      subject { create_enum(:sizes, [:small, :medium, :large, 'extra large']) }
 
       it 'creates an enum' do
-        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
+        expect(subject).to eq(PG::PGRES_COMMAND_OK)
+        expect(connection.enums[:sizes]).to eq(['small', 'medium', 'large', 'extra large'])
       end
     end
 
     context 'when called with a malformed name' do
-      subject { connection.create_enum('an enum', [:first_value, 'second value']) }
+      subject { create_enum('bad enum name', [:small, :medium, :large, 'extra large']) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -28,7 +35,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with malformed values' do
-      subject { connection.create_enum(:an_enum, [:good_value, 'bad$value']) }
+      subject { create_enum(:sizes, [:small, :medium, :large, 'extra large', 'extra+extra+large']) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -38,24 +45,26 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
 
   describe '#rename_enum' do
     before do
-      connection.execute "CREATE TYPE an_enum AS ENUM ('first', 'second')"
+      connection.execute "CREATE TYPE sizes AS ENUM ('small', 'medium', 'large', 'extra large')"
     end
 
     after do
-      connection.execute 'DROP TYPE IF EXISTS an_enum'
-      connection.execute 'DROP TYPE IF EXISTS another_enum'
+      connection.execute 'DROP TYPE IF EXISTS lengths'
+      connection.execute 'DROP TYPE IF EXISTS sizes'
     end
 
     context 'when called with valid arguments' do
-      subject { connection.rename_enum(:an_enum, :another_enum) }
+      subject { rename_enum(:sizes, :lengths) }
 
       it 'renames the enum' do
-        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
+        expect(subject).to eq(PG::PGRES_COMMAND_OK)
+        expect(connection.enums).to have_key(:lengths)
+        expect(connection.enums).not_to have_key(:sizes)
       end
     end
 
     context 'when called with a non-existent enum name' do
-      subject { connection.rename_enum(:non_existent_enum, :another_enum) }
+      subject { rename_enum(:non_existent_enum, :lengths) }
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
@@ -63,7 +72,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed current name' do
-      subject { connection.rename_enum('an enum', :another_enum) }
+      subject { rename_enum('bad enum name', :lengths) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -71,7 +80,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed new name' do
-      subject { connection.rename_enum(:an_enum, 'another enum') }
+      subject { rename_enum(:sizes, 'bad enum name') }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -80,19 +89,20 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   end
 
   describe '#drop_enum' do
-    before { connection.execute "CREATE TYPE an_enum AS ENUM ('first', 'second')" }
-    after  { connection.execute 'DROP TYPE IF EXISTS an_enum' }
+    before { connection.execute "CREATE TYPE sizes AS ENUM ('small', 'medium', 'large', 'extra large')" }
+    after  { connection.execute 'DROP TYPE IF EXISTS sizes' }
 
     context 'when called with valid arguments' do
-      subject { connection.drop_enum(:an_enum) }
+      subject { drop_enum(:sizes) }
 
       it 'drops the enum' do
-        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
+        expect(subject).to eq(PG::PGRES_COMMAND_OK)
+        expect(connection.enums).not_to have_key(:sizes)
       end
     end
 
     context 'when called with a non-existent enum name' do
-      subject { connection.drop_enum(:non_existent_enum) }
+      subject { drop_enum(:non_existent_enum) }
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
@@ -100,7 +110,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed name' do
-      subject { connection.drop_enum('an enum') }
+      subject { drop_enum('bad enum name') }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -109,37 +119,37 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   end
 
   describe '#add_enum_value' do
-    before { connection.execute "CREATE TYPE numbers AS ENUM ('one', 'two', 'four', 'six', 'eight')" }
-    after  { connection.execute 'DROP TYPE IF EXISTS numbers' }
+    before { connection.execute "CREATE TYPE sizes AS ENUM ('small', 'large', 'extra large')" }
+    after  { connection.execute 'DROP TYPE IF EXISTS sizes' }
 
     context 'when called with valid arguments' do
-      subject { connection.add_enum_value(:numbers, :nine) }
+      subject { add_enum_value(:sizes, 'extra extra large') }
 
       it 'appends the value' do
-        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
-        expect(connection.enums[:numbers]).to eq(%w[one two four six eight nine])
+        expect(subject).to eq(PG::PGRES_COMMAND_OK)
+        expect(connection.enums[:sizes]).to eq(['small', 'large', 'extra large', 'extra extra large'])
       end
 
       context 'with :before' do
-        subject { connection.add_enum_value(:numbers, :three, before: :four) }
+        subject { add_enum_value(:sizes, 'extra small', before: :small) }
 
         it 'inserts the value at the correct position' do
-          expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
-          expect(connection.enums[:numbers]).to eq(%w[one two three four six eight])
+          expect(subject).to eq(PG::PGRES_COMMAND_OK)
+          expect(connection.enums[:sizes]).to eq(['extra small', 'small', 'large', 'extra large'])
         end
       end
 
       context 'with :after' do
-        subject { connection.add_enum_value(:numbers, :seven, after: :six) }
+        subject { add_enum_value(:sizes, :medium, after: :small) }
 
         it 'inserts the value at the correct position' do
-          expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
-          expect(connection.enums[:numbers]).to eq(%w[one two four six seven eight])
+          expect(subject).to eq(PG::PGRES_COMMAND_OK)
+          expect(connection.enums[:sizes]).to eq(['small', 'medium', 'large', 'extra large'])
         end
       end
 
       context 'with :before and :after' do
-        subject { connection.add_enum_value(:numbers, :five, before: :six, after: :four) }
+        subject { add_enum_value(:sizes, :medium, before: :large, after: :small) }
 
         it 'raises an ArgumentError' do
           expect { subject }.to raise_exception(ArgumentError)
@@ -148,7 +158,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a non-existent enum name' do
-      subject { connection.add_enum_value(:non_existent_enum, :new_value) }
+      subject { add_enum_value(:non_existent_enum, :new_value) }
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
@@ -156,7 +166,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed name' do
-      subject { connection.add_enum_value('an enum', :new_value) }
+      subject { add_enum_value('bad enum name', :new_value) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -165,20 +175,30 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   end
 
   describe '#rename_enum_value' do
-    before { connection.execute "CREATE TYPE numbers AS ENUM ('one', 'two', 'four')" }
-    after  { connection.execute 'DROP TYPE IF EXISTS numbers' }
+    before { connection.execute "CREATE TYPE sizes AS ENUM ('small', 'medium', 'large', 'extra large')" }
+    after  { connection.execute 'DROP TYPE IF EXISTS sizes' }
 
     context 'when called with valid arguments' do
-      subject { connection.rename_enum_value(:numbers, :four, :three) }
+      subject { rename_enum_value(:sizes, 'extra large', :extra_large) }
 
       it 'renames the value' do
-        expect(subject.result_status).to eq(PG::PGRES_COMMAND_OK)
-        expect(connection.enums[:numbers]).to eq(%w[one two three])
+        expect(subject).to eq(PG::PGRES_COMMAND_OK)
+        expect(connection.enums[:sizes]).to eq(%w[small medium large extra_large])
+      end
+
+      context 'when using PostgreSQL < 10.0' do
+        before do
+          allow(connection).to receive(:postgresql_version).and_return(99_999)
+        end
+
+        it 'raises a NotImplementedError' do
+          expect { subject }.to raise_exception(NotImplementedError)
+        end
       end
     end
 
     context 'when called with a non-existent enum name' do
-      subject { connection.rename_enum_value(:non_existent_enum, :four, :three) }
+      subject { rename_enum_value(:non_existent_enum, :previous_value, :new_value) }
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
@@ -186,7 +206,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a non-existent enum value' do
-      subject { connection.rename_enum_value(:numbers, :ten, :three) }
+      subject { rename_enum_value(:sizes, 'extra extra large', :extra_extra_large) }
 
       it 'raises ActiveRecord::StatementInvalid' do
         expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
@@ -194,7 +214,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed name' do
-      subject { connection.rename_enum_value('an enum', :four, :three) }
+      subject { rename_enum_value('bad enum name', 'extra large', :extra_large) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -202,7 +222,7 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed current value' do
-      subject { connection.rename_enum_value(:numbers, 'bad$value', :three) }
+      subject { rename_enum_value(:sizes, 'extra-large', :extra_large) }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
@@ -210,10 +230,26 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
 
     context 'when called with a malformed new value' do
-      subject { connection.rename_enum_value(:numbers, :four, 'bad$value') }
+      subject { rename_enum_value(:sizes, 'extra large', 'extra-large') }
 
       it 'raises an ArgumentError' do
         expect { subject }.to raise_exception(ArgumentError)
+      end
+    end
+
+    context 'when called with an equivalent current value and new value' do
+      subject { rename_enum_value(:sizes, 'extra large', 'extra large') }
+
+      it 'raises ActiveRecord::StatementInvalid' do
+        expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
+      end
+    end
+
+    context 'when called with a new value matching an existing value' do
+      subject { rename_enum_value(:sizes, 'extra large', :large) }
+
+      it 'raises ActiveRecord::StatementInvalid' do
+        expect { subject }.to raise_exception(ActiveRecord::StatementInvalid)
       end
     end
   end
