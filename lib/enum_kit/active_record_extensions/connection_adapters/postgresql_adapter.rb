@@ -30,7 +30,7 @@ module EnumKit
         # @return [Hash] The enum types available in the database.
         #
         def enums
-          select_all(ENUM_QUERY.tr("\n", ' ').strip).each_with_object({}) do |row, enums|
+          @enums ||= select_all(ENUM_QUERY.tr("\n", ' ').strip).each_with_object({}) do |row, enums|
             enums[row['typname'].to_sym] = row['values'].split("\t\t")
           end
         end
