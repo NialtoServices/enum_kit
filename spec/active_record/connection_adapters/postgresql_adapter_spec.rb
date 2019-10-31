@@ -6,11 +6,27 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
   before do
     # Sanity check to ensure ActiveRecord is configured to use a PostgreSQL database.
     expect(connection).to be_a(described_class)
+
+    # Clear the cached enums before each test to ensure clean tests.
+    connection.clear_enum_cache!
   end
 
   %i[create_enum rename_enum drop_enum add_enum_value rename_enum_value].each do |method|
     define_method(method) do |*args, &block|
       connection.send(method, *args, &block).result_status
+    end
+  end
+
+  # TODO: Investigate possible alternatives as this test is a bit odd.
+  describe '#clear_enum_cache!' do
+    it 'sets @enums to nil' do
+      connection.instance_eval do
+        @enums = { sizes: ['small', 'medium', 'large', 'extra large'] }
+      end
+
+      connection.clear_enum_cache!
+
+      expect(connection.instance_eval { @enums }).to be nil
     end
   end
 

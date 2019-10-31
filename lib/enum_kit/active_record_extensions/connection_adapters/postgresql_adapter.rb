@@ -27,6 +27,12 @@ module EnumKit
           ORDER BY pg_type.typname
         SQL
 
+        # Clear the cached enums to force a refresh the next time they are accessed.
+        #
+        def clear_enum_cache!
+          @enums = nil
+        end
+
         # @return [Hash] The enum types available in the database.
         #
         def enums
