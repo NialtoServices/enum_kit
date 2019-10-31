@@ -125,7 +125,7 @@ module EnumKit
         # Raise an exception if the active PostgreSQL version doesn't support renaming enum values.
         #
         def ensure_renaming_enum_values_is_supported!
-          return if ActiveRecord::Base.connection.send(:postgresql_version) >= 100_000
+          return if ActiveRecord::Base.connection.postgresql_version >= 100_000
 
           raise NotImplementedError, 'PostgreSQL 10.0+ is required to enable renaming of enum values.'
         end
