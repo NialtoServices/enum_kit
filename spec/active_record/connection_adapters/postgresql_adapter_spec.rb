@@ -30,6 +30,21 @@ RSpec.describe ActiveRecord::ConnectionAdapters::PostgreSQLAdapter, :unit do
     end
   end
 
+
+  describe '#enum_execute' do
+    subject { connection.enum_execute('SELECT 1=1') }
+
+    it 'invokes #execute with the specified arguments' do
+      expect(connection).to receive(:execute).with('SELECT 1=1').once
+      subject
+    end
+
+    it 'invokes #clear_enum_cache!' do
+      expect(connection).to receive(:clear_enum_cache!).once
+      subject
+    end
+  end
+
   describe '#create_enum' do
     after { connection.execute 'DROP TYPE IF EXISTS sizes' }
 

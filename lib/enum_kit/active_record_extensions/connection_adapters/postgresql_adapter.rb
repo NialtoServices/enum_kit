@@ -50,7 +50,7 @@ module EnumKit
           name   = EnumKit.sanitize_name!(name)
           values = EnumKit.sanitize_values!(values)
 
-          execute "CREATE TYPE #{name} AS ENUM #{EnumKit.sqlize(values)}"
+          enum_execute "CREATE TYPE #{name} AS ENUM #{EnumKit.sqlize(values)}"
         end
 
         # Rename an existing enum type.
@@ -62,7 +62,7 @@ module EnumKit
           current_name = EnumKit.sanitize_name!(current_name)
           new_name     = EnumKit.sanitize_name!(new_name)
 
-          execute "ALTER TYPE #{current_name} RENAME TO #{new_name}"
+          enum_execute "ALTER TYPE #{current_name} RENAME TO #{new_name}"
         end
 
         # Drop an existing enum type from the database.
@@ -72,7 +72,7 @@ module EnumKit
         def drop_enum(name)
           name = EnumKit.sanitize_name!(name)
 
-          execute "DROP TYPE #{name}"
+          enum_execute "DROP TYPE #{name}"
         end
 
         # Add a new value to an enum type in the database.
@@ -95,7 +95,7 @@ module EnumKit
           statement += " AFTER #{EnumKit.sqlize(EnumKit.sanitize_value!(after))}"   if after
           statement += " BEFORE #{EnumKit.sqlize(EnumKit.sanitize_value!(before))}" if before
 
-          execute(statement)
+          enum_execute(statement)
         end
 
         # Rename a value within an enum type in the database.
@@ -111,7 +111,7 @@ module EnumKit
           current_name = EnumKit.sanitize_value!(current_name)
           new_name     = EnumKit.sanitize_value!(new_name)
 
-          execute "ALTER TYPE #{name} RENAME VALUE #{EnumKit.sqlize(current_name)} TO #{EnumKit.sqlize(new_name)}"
+          enum_execute "ALTER TYPE #{name} RENAME VALUE #{EnumKit.sqlize(current_name)} TO #{EnumKit.sqlize(new_name)}"
         end
 
         # :nodoc:
@@ -134,6 +134,14 @@ module EnumKit
           return if ActiveRecord::Base.connection.postgresql_version >= 100_000
 
           raise NotImplementedError, 'PostgreSQL 10.0+ is required to enable renaming of enum values.'
+        end
+
+        # Execute a SQL statement, then clear the enum cache.
+        #
+        def enum_execute(*args, &block)
+          result = execute(*args, &block)
+          clear_enum_cache!
+          result
         end
       end
     end
