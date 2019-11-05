@@ -8,8 +8,8 @@ module ActiveRecord
   module Enum
     # Retrieve the acceptable values for the enum type associated with the given column.
     #
-    # @param  [String, Symbol] The name of an enum column.
-    # @return [Array]          The acceptable values for the enum type associated with the column.
+    # @param  column_name [String, Symbol] The name of a column representing an enum.
+    # @return             [Array]          The acceptable values for the enum type associated with the column.
     #
     def pg_enum_values(column_name)
       type = columns_hash[column_name.to_s]&.sql_type
@@ -25,15 +25,19 @@ module ActiveRecord
 
     # Define a PostgreSQL enum type.
     #
-    # @param name    [String] The name of an enum column.
-    # @param options [Hash]   The options.
+    # By default, setting an enum attribute to an unregistered value results in an exception being raised.
+    # You can disable this feature by setting the option `:exceptions` to `false` when registering the enum:
+    #   => pg_enum :size, exceptions: false
     #
-    def pg_enum(name, options = {})
-      values = pg_enum_values(name).map { |value| [value.to_sym, value.to_s] }
+    # @param column_name [String, Symbol] The name of a column representing an enum.
+    # @param options     [Hash]           Any additional options.
+    #
+    def pg_enum(column_name, options = {})
+      values = pg_enum_values(column_name).map { |v| [v.to_sym, v.to_s] }
 
-      enum(name => Hash[values])
+      enum(column_name => Hash[values])
 
-      enum = type_for_attribute(name)
+      enum = type_for_attribute(column_name)
 
       raise 'Expected an ActiveRecord::Enum::EnumType' unless enum.is_a?(ActiveRecord::Enum::EnumType)
 
