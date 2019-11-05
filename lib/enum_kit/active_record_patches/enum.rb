@@ -11,12 +11,16 @@ module ActiveRecord
     # @param  [String, Symbol] The name of an enum column.
     # @return [Array]          The acceptable values for the enum type associated with the column.
     #
-    def pg_enum_values(name)
-      # Determine the PostgreSQL type for the enum.
-      type = columns_hash[name.to_s].sql_type
+    def pg_enum_values(column_name)
+      type = columns_hash[column_name.to_s]&.sql_type
 
-      # Query the PostgreSQL database for the enum's acceptable values.
-      connection.enums[type.to_sym]
+      raise "Unable to determine '#{table_name}.#{column_name}' type. Did you forget to db:migrate?" if type.blank?
+
+      enums = connection.enums[type.to_sym]
+
+      raise "Unable to retrieve enums for type '#{type}'. Did you forget to db:migrate?" if enums.nil?
+
+      enums
     end
 
     # Define a PostgreSQL enum type.
