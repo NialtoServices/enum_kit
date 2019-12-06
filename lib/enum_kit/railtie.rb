@@ -4,6 +4,12 @@ module EnumKit
   # ...
   #
   class Railtie < Rails::Railtie
+    initializer 'enum_kit.set_configs' do |app|
+      app.configure do
+        config.enum_kit = { disable_exceptions: false }
+      end
+    end
+
     initializer 'enum_kit.active_record.patches', after: 'active_record.initialize_database' do
       require 'enum_kit/active_record_patches/connection_adapters/postgresql/column_methods'
       require 'enum_kit/active_record_patches/connection_adapters/postgresql/oid/enum'
