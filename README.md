@@ -13,13 +13,16 @@ You can install **EnumKit** using the following command:
 Or, by adding the following to your `Gemfile`:
 
 ```ruby
-gem 'enum_kit', '~> 0.1'
+gem 'enum_kit', '~> 0.3'
 ```
 
 ### Usage
 
-Here's a sample migration file which creates the enum `:shirt_size`, then adds the column `:size` to the `:shirts`
-table using the `:shirt_size` enum as the underlying type:
+Here is an example migration file that creates an enum called `:shirt_size` and then adds it to the `:shirts` table
+using the column name `:size`:
+
+*Pro Tip:* You can omit the `:enum_type` attribute when the name of the enum you want to use exactly matches the name
+of the column you're adding.
 
 ```ruby
 class CreateShirts < ActiveRecord::Migration[6.0]
@@ -28,7 +31,7 @@ class CreateShirts < ActiveRecord::Migration[6.0]
 
     create_table :shirts do |t|
       t.string :name
-      t.enum   :size, name: :shirt_size
+      t.enum   :size, enum_type: :shirt_size
 
       t.timestamps
     end
@@ -36,18 +39,18 @@ class CreateShirts < ActiveRecord::Migration[6.0]
 end
 ```
 
-You can remove the enum later using something similar to this:
+You can also remove an enum from the database, but you'll need to remove any associated columns first:
 
 ```ruby
 class DropShirts < ActiveRecord::Migration[6.0]
   def change
-    drop_table :shirts
-    drop_enum  :shirt_size
+    remove_column :shirts, :size
+    drop_enum :shirt_size
   end
 end
 ```
 
-Once you've defined an enum in a migration file, you can use it in the associated model:
+Once you've defined an enum, you can use it in the associated model with the `#pg_enum` method:
 
 ```ruby
 class Shirt < ActiveRecord::Base
@@ -55,27 +58,23 @@ class Shirt < ActiveRecord::Base
 end
 ```
 
-Note that you don't need to define the enum's cases again.
-The `pg_enum` method automatically queries the database when Rails boots for the acceptable values!
+Note that you don't need to define the enum's cases again. The `#pg_enum` method automatically queries the database
+once when the model is loaded to determine the supported values.
 
 ---
 
-When setting the enum to an unsupported value, an exception is raised. This can be problematic in cases where you don't
-have control over the input (such as when using APIs).
+When setting an enum to a value that is not supported, an exception is raised. This can be inconvenient in some cases
+such as an API where you can't control what value is submitted.
 
-To improve this, you can optionally specify that exceptions should not be raised on a per enum basis. Note that when
-opting for this feature, you'd ideally specify a validation to capture any unsupported values:
+You can disable the default 'exception raising' behaviour by adding a custom initializer to your Rails project:
 
 ```ruby
-class Shirt < ActiveRecord::Base
-  pg_enum :size, exceptions: false
-
-  validates :size, pg_enum: true
-end
+# Prevent enums from raising exceptions when set to unsupported values.
+Rails.application.config.enum_kit.disable_exceptions = true
 ```
 
-The above prevents exceptions from being raised and checks that the assigned value is one of the cases supported by the
-enum.
+Please note that this will affect *all* enums defined in your Rails app, as the `pg_enum` method simply uses the `enum`
+method behind the scenes. There isn't currently an option to set this on a per enum basis.
 
 ## Development
 
