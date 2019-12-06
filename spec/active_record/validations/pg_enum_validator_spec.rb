@@ -1,19 +1,22 @@
 # frozen_string_literal: true
 
 RSpec.describe ActiveRecord::Validations::PgEnumValidator, :unit do
-  subject { Shirt.create(name: 'Plain Shirt', size: :small) }
+  subject { Shirt.create(name: 'Plain Shirt', size: :medium) }
 
-  it 'permits known values' do
-    expect { subject.update!(size: :large) }.not_to raise_exception
-    expect { subject.update!(size: :medium) }.not_to raise_exception
-    expect { subject.update!(size: :small) }.not_to raise_exception
+  it 'passes validation when using supported values' do
+    %i[small medium large].each do |size|
+      expect(subject.update(size: size)).to eq(true)
+      expect(subject).to be_valid
+    end
   end
 
-  it 'rejects unknown values' do
-    expect { subject.update!(size: :other) }.to raise_exception(ActiveRecord::RecordInvalid)
+  it 'fails validation when using an unsupported value' do
+    expect(subject.update(size: :other)).to eq(false)
+    expect(subject).not_to be_valid
   end
 
-  it 'rejects nil values' do
-    expect { subject.update!(size: nil) }.to raise_exception(ActiveRecord::RecordInvalid)
+  it 'fails validation when using nil' do
+    expect(subject.update(size: nil)).to eq(false)
+    expect(subject).not_to be_valid
   end
 end
