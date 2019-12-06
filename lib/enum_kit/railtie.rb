@@ -13,7 +13,7 @@ module EnumKit
 
     initializer 'enum_kit.active_support.register_active_record_handler', after: 'active_support.set_configs' do
       ActiveSupport.on_load(:active_record) do
-        # Patches
+        # Require the ActiveRecord patches.
         require 'enum_kit/active_record_patches/connection_adapters/postgresql/column_methods'
         require 'enum_kit/active_record_patches/connection_adapters/postgresql/oid/enum'
         require 'enum_kit/active_record_patches/connection_adapters/postgresql/oid/type_map_initializer'
@@ -21,7 +21,7 @@ module EnumKit
         require 'enum_kit/active_record_patches/enum/enum_type'
         require 'enum_kit/active_record_patches/validations/pg_enum_validator'
 
-        # Extensions
+        # Require the ActiveRecord extensions.
         %w[
           ConnectionAdapters::PostgreSQL::ColumnDumper
           ConnectionAdapters::PostgreSQL::SchemaDumper
@@ -39,7 +39,7 @@ module EnumKit
           target_constant.prepend(extension_constant)
         end
 
-        # Database Types
+        # Register `:enum` as a native database type.
         ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::NATIVE_DATABASE_TYPES[:enum] = { name: 'enum' }
       end
     end
