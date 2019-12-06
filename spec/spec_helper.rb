@@ -12,15 +12,15 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-# Bundler
-require 'bundler'
-
-Bundler.require :default, :test
-
 # Combustion
 require 'combustion'
 
 Combustion.initialize! :active_record
+
+# Bundler
+require 'bundler'
+
+Bundler.require :default, :test
 
 # Rails
 require 'rspec/rails'
