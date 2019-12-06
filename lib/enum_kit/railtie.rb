@@ -6,7 +6,8 @@ module EnumKit
   class Railtie < Rails::Railtie
     initializer 'enum_kit.set_configs' do |app|
       app.configure do
-        config.enum_kit = { disable_exceptions: false }
+        config.enum_kit = ActiveSupport::OrderedOptions.new
+        config.enum_kit.disable_exceptions = false
       end
     end
 
