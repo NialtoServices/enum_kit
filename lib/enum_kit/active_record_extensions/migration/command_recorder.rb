@@ -44,13 +44,13 @@ module EnumKit
 
         # Invert the creation of an enum type by deleting it.
         #
-        def invert_create_enum(args)
+        def invert_create_enum(*args)
           record(:drop_enum, args.first)
         end
 
         # Invert the renaming of an enum by renaming it back to the previous name.
         #
-        def invert_rename_enum(args)
+        def invert_rename_enum(*args)
           record(:rename_enum, args.reverse)
         end
 
@@ -59,7 +59,7 @@ module EnumKit
         # Note that `drop_enum` can only be reversed if given a collection of values to call `create_enum` with as the
         # previously deleted enum values cannot be automatically determined.
         #
-        def invert_drop_enum(args)
+        def invert_drop_enum(*args)
           unless args.length > 1
             raise ActiveRecord::IrreversibleMigration, 'drop_enum is only reversible if given an Array of values.'
           end
@@ -69,13 +69,13 @@ module EnumKit
 
         # Invert the addition of a value to an enum type by removing the value.
         #
-        def invert_add_enum_value(_args)
+        def invert_add_enum_value(*args)
           raise ActiveRecord::IrreversibleMigration, 'add_enum_value is not reversible.'
         end
 
         # Invert the renaming of an enum's value by renaming it back to the previous value.
         #
-        def invert_rename_enum_value(args)
+        def invert_rename_enum_value(*args)
           record(:rename_enum_value, args[0], args[2], args[1])
         end
       end
