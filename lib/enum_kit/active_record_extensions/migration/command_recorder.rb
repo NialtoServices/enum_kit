@@ -45,7 +45,7 @@ module EnumKit
         # Invert the creation of an enum type by deleting it.
         #
         def invert_create_enum(*args)
-          record(:drop_enum, args.first)
+          record(:drop_enum, args)
         end
 
         # Invert the renaming of an enum by renaming it back to the previous name.
